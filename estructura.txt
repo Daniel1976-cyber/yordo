@@ -1,0 +1,10 @@
+inventario-app/
+│
+├── db/
+│   └── database.js
+│
+├── models/
+├── routes/
+├── services/
+├── app.js
+└── package.json

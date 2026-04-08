@@ -1,0 +1,18 @@
+{
+  "fecha": "2026-04-01",
+  "tipo_pago": "CUP",
+  "estado": "PAGADO",
+  "cliente": "Juan Perez",
+  "productos": [
+    {
+      "producto_id": 1,
+      "cantidad": 5,
+      "precio_venta": 150
+    },
+    {
+      "producto_id": 2,
+      "cantidad": 3,
+      "precio_venta": 200
+    }
+  ]
+}

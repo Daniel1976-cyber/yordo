@@ -1,0 +1,6 @@
+id
+producto_id
+cantidad_inicial
+cantidad_restante
+precio_costo_unitario
+fecha

@@ -1,0 +1,5 @@
+id
+venta_id
+producto_id
+cantidad
+precio_venta_unitario

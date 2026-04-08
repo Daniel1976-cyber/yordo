@@ -1,0 +1,5 @@
+id
+fecha
+tipo_pago (CUP / CUPD)
+estado (PAGADO / PENDIENTE)
+cliente

@@ -1,0 +1,3 @@
+id
+nombre
+unidad (lt, unidad, paquete)

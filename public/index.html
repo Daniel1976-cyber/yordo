@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yordo | Business Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-dark: #0d1b2a;
+            --navy-primary: #1b263b;
+            --navy-light: #415a77;
+            --silk-gray: #e0e1dd;
+            --bg-gray: #f4f7f6;
+            --text-main: #333;
+            --white: #ffffff;
+            --accent: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-gray); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background-color: var(--navy-dark); color: var(--white); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { padding: 30px 20px; font-size: 1.5em; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
+        .sidebar-menu { flex-grow: 1; padding: 20px 0; }
+        .menu-item { padding: 12px 25px; cursor: pointer; display: flex; align-items: center; transition: all 0.3s; color: var(--silk-gray); font-weight: 500; font-size: 0.95em; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+        .menu-item.active { background: var(--accent); color: var(--white); border-right: 4px solid var(--white); }
+
+        /* Main Content */
+        .main-content { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .top-bar { height: 70px; background: var(--white); border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: sticky; top: 0; z-index: 100; }
+        .container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* KPI Cards */
+        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+        .kpi-label { font-size: 0.85em; color: #777; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .kpi-value { font-size: 1.8em; font-weight: 700; color: var(--navy-dark); }
+        .kpi-footer { font-size: 0.8em; margin-top: 10px; color: #666; }
+
+        /* Sections */
+        .card { background: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #eee; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .card-title { font-size: 1.25em; font-weight: 600; color: var(--navy-primary); }
+
+        /* Buttons and Form */
+        button { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 0.9em; }
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-primary:hover { background-color: #1976D2; transform: translateY(-1px); }
+        .btn-secondary { background-color: #e3f2fd; color: var(--accent); }
+        .btn-outline { background-color: transparent; border: 1.5px solid var(--accent); color: var(--accent); }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 15px; background: #f9fafb; font-weight: 600; color: #555; border-bottom: 2px solid #eee; font-size: 0.9em; }
+        td { padding: 15px; border-bottom: 1px solid #f0f0f0; color: #444; font-size: 0.95em; }
+        tr:hover { background-color: #fcfcfc; }
+        .total-row { background-color: #f9fafb; font-weight: 700; }
+
+        /* Inventory Menu */
+        .ingenieria-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .categoria-box { padding: 20px; border-radius: 12px; border: 1px solid #eee; }
+        .estrellas-box { background-color: #e8f5e9; border-top: 5px solid var(--success); }
+        .caballitos-box { background-color: #fff3e0; border-top: 5px solid var(--warning); }
+        .rompecabezas-box { background-color: #e3f2fd; border-top: 5px solid var(--accent); }
+        .perros-box { background-color: #ffdde1; border-top: 5px solid var(--danger); }
+        .categoria-titulo { font-weight: 700; margin-bottom: 10px; color: #333; }
+        .categoria-desc { font-size: 0.85em; color: #666; margin-bottom: 15px; }
+
+        /* Form */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .input-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .input-group label { font-size: 0.9em; font-weight: 600; margin-bottom: 8px; color: #555; }
+        .input-group input, .input-group select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1em; }
+        .input-group input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1); }
+
+        .hidden { display: none; }
+        #loader { text-align: center; padding: 50px; color: var(--navy-light); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">📊 YORDO BIZ</div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" onclick="showSection('dashboard')">Dashboard</div>
+            <div class="menu-item" onclick="showSection('inventario')">Inventario</div>
+            <div class="menu-item" onclick="showSection('ventas')">Reporte de Ventas</div>
+            <div class="menu-item" onclick="showSection('ingenieria')">Ingeniería de Menú</div>
+            <div class="menu-item" onclick="showSection('recientes')">Ventas Recientes</div>
+            <div class="menu-item" onclick="showSection('registro')">Nueva Venta</div>
+        </div>
+        <div style="padding: 20px; font-size: 0.75em; color: #888; text-align: center;">V 2.0 | © 2024</div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="card-title">Resumen de Negocio</div>
+            <button class="btn-primary" onclick="showSection('registro')">+ Nueva Venta</button>
+        </header>
+
+        <div id="loader">Cargando datos maestros...</div>
+
+        <div id="content" class="container hidden">
+            
+            <!-- SECCION: DASHBOARD (Home con KPIs) -->
+            <div id="section-dashboard" class="content-section">
+                <div class="kpi-container" id="kpi-summary">
+                    <!-- Dinámico -->
+                </div>
+
+                <div class="grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Evolución de Ventas</span></div>
+                        <div id="mini-ventas-grafico">Cargando datos...</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Top Productos</span></div>
+                        <div id="mini-top-productos">Cargando...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCION: INVENTARIO -->
+            <div id="section-inventario" class="content-section hidden">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Existencias de Inventario</span></div>
+                    <div id="inventario-resultado"></div>
+                </div>
+            </div>
+
+            <!-- SECCION: VENTAS -->
+            <div id="section-ventas" class="content-section hidden">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Histórico de Ventas</span></div>
+                    <div id="ventas-resultado"></div>
+                </div>
+            </div>
+
+            <!-- SECCION: INGENIERIA -->
+            <div id="section-ingenieria" class="content-section hidden">
+                <div id="ingenieria-resultado"></div>
+            </div>
+
+            <!-- SECCION: RECIENTES -->
+            <div id="section-recientes" class="content-section hidden">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Listado de Ventas Recientes</span></div>
+                    <div id="ventas-recientes-resultado"></div>
+                </div>
+            </div>
+
+            <!-- SECCION: REGISTRO -->
+            <div id="section-registro" class="content-section hidden">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Formulario de Registro</span></div>
+                    <form id="ventaForm">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>Producto:</label>
+                                <select id="producto"></select>
+                            </div>
+                            <div class="input-group">
+                                <label>Cantidad:</label>
+                                <input type="number" id="cantidad" placeholder="0">
+                            </div>
+                            <div class="input-group">
+                                <label>Precio Unitario:</label>
+                                <input type="number" id="precio" step="0.01">
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>Tipo de pago:</label>
+                                <select id="tipo_pago">
+                                    <option value="CUP">CUP (Efectivo)</option>
+                                    <option value="CUPD">CUPD (Digital)</option>
+                                    <option value="CREDITO">Crédito (Por Cobrar)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Cliente:</label>
+                                <input type="text" id="cliente" placeholder="Nombre completo">
+                            </div>
+                            <div class="input-group" style="justify-content: flex-end;">
+                                <button type="submit" class="btn-primary" style="padding: 15px;">Registrar Venta Directa</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="resultado" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Navegación
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('section-' + id).classList.remove('hidden');
+            
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Títulos dinámicos en la barra superior
+            const titulos = {
+                dashboard: 'Resumen Estratégico',
+                inventario: 'Gestión de Stock',
+                ventas: 'Reportes de Utilidad',
+                ingenieria: 'Análisis de Menú',
+                recientes: 'Auditoría de Ventas',
+                registro: 'Punto de Venta'
+            };
+            document.querySelector('.top-bar .card-title').innerText = titulos[id] || 'Dashboard';
+        }
+
+        // Lógica de carga centralizada (Carga KPIs al inicio)
+        window.onload = async () => {
+            await cargarProductos(); // Necesario para el select
+            await inicializarDashboard();
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+        };
+
+        async function inicializarDashboard() {
+            try {
+                // Paralelizar peticiones iniciales
+                const [resMetricas, resInventario, resIngenieria] = await Promise.all([
+                    fetch('/metricas'),
+                    fetch('/inventario'),
+                    fetch('/metricas/ingenieria')
+                ]);
+                
+                const m = await resMetricas.json();
+                const inv = await resInventario.json();
+                const ing = await resIngenieria.json();
+
+                // Render KPIs
+                const kpiSummary = document.getElementById('kpi-summary');
+                kpiSummary.innerHTML = `
+                    <div class="kpi-card anim-fade-in">
+                        <div class="kpi-label">Ingresos Totales</div>
+                        <div class="kpi-value">$${m.resumen.totalVentas.toFixed(2)}</div>
+                        <div class="kpi-footer">CUP</div>
+                    </div>
+                    <div class="kpi-card anim-fade-in">
+                        <div class="kpi-label">Utilidad Bruta</div>
+                        <div class="kpi-value" style="color: var(--success)">$${m.resumen.totalUtilidad.toFixed(2)}</div>
+                        <div class="kpi-footer">Neto Aproximado</div>
+                    </div>
+                    <div class="kpi-card anim-fade-in">
+                        <div class="kpi-label">Margen Operativo</div>
+                        <div class="kpi-value">${m.resumen.margenGeneral}%</div>
+                        <div class="kpi-footer">Eficiencia</div>
+                    </div>
+                    <div class="kpi-card anim-fade-in">
+                        <div class="kpi-label">Ticket Promedio</div>
+                        <div class="kpi-value">$${m.resumen.ticketPromedio}</div>
+                        <div class="kpi-footer">${m.resumen.totalTransacciones} Ventas</div>
+                    </div>
+                `;
+
+                // Render mini-top
+                let topHtml = '<table>';
+                m.topProductosCantidad.forEach((p, i) => {
+                    topHtml += `<tr><td>${i+1}. ${p.nombre}</td><td style="text-align:right"><strong>${p.cantidadVendida}</strong></td></tr>`;
+                });
+                topHtml += '</table>';
+                document.getElementById('mini-top-productos').innerHTML = topHtml;
+
+                // Actualizar todas las secciones
+                renderInventario(inv);
+                renderIngenieria(ing);
+                
+                // Estos requieren fetch adicional, los esperamos
+                await Promise.all([
+                    renderVentasRecientes(),
+                    renderHistoricoVentas()
+                ]);
+
+            } catch (err) {
+                console.error('Error actualizando dashboard:', err);
+            }
+        }
+
+        function renderInventario(data) {
+            let html = `<table><thead><tr><th>Producto</th><th>Stock</th><th>Valor (Costo)</th></tr></thead><tbody>`;
+            let total = 0;
+            data.forEach(item => {
+                total += item.valor || 0;
+                html += `<tr><td>${item.nombre}</td><td>${item.stock}</td><td>$${(item.valor || 0).toFixed(2)}</td></tr>`;
+            });
+            html += `</tbody><tfoot><tr class="total-row"><td colspan="2">VALOR TOTAL</td><td>$${total.toFixed(2)}</td></tr></tfoot></table>`;
+            document.getElementById('inventario-resultado').innerHTML = html;
+        }
+
+        function renderIngenieria(data) {
+            if (!data.categorias) return;
+            const cat = data.categorias;
+            let html = `
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Ingeniería de Menú</span></div>
+                    <p style="font-size: 0.9em; margin-bottom: 20px; color: #666;">
+                        Segmentación estratégica basada en popularidad (ventas) y rentabilidad (margen unitario).
+                    </p>
+                    <div class="ingenieria-grid">
+            `;
+            const boxes = [
+                { key: 'estrellas', class: 'estrellas-box' },
+                { key: 'caballitos', class: 'caballitos-box' },
+                { key: 'rompecabezas', class: 'rompecabezas-box' },
+                { key: 'perros', class: 'perros-box' }
+            ];
+            boxes.forEach(box => {
+                const c = cat[box.key];
+                html += `<div class="categoria-box ${box.class}">
+                    <div class="categoria-titulo">${c.titulo}</div>
+                    <div class="categoria-desc">${c.descripcion}</div>
+                    <ul>${c.productos.length > 0 ? c.productos.map(p => `<li><strong>${p.nombre}</strong><br><small>${p.cantidad} vtas | $${p.utilidadUnitaria.toFixed(2)} ganancia por unidad</small></li>`).join('') : '<li>-</li>'}</ul>
+                </div>`;
+            });
+            html += '</div></div>';
+            document.getElementById('ingenieria-resultado').innerHTML = html;
+        }
+
+        async function renderVentasRecientes() {
+            const res = await fetch('/ventas/recientes');
+            const data = await res.json();
+            let html = `<table><thead><tr><th>Fecha</th><th>Producto</th><th>Cant.</th><th>Importe</th><th>Estado</th></tr></thead><tbody>`;
+            data.ventas.forEach(v => {
+                const color = v.estado === 'PAGADO' ? 'var(--success)' : 'var(--warning)';
+                html += `<tr><td>${v.fecha}</td><td>${v.producto}</td><td>${v.cantidad}</td><td>$${v.importe.toFixed(2)}</td><td style="color:${color}; font-weight:700">${v.estado}</td></tr>`;
+            });
+            html += `</tbody></table>`;
+            document.getElementById('ventas-recientes-resultado').innerHTML = html;
+        }
+
+        async function renderHistoricoVentas() {
+            const res = await fetch('/ventas');
+            const data = await res.json();
+            let html = `<table><thead><tr><th>Fecha</th><th>Total Ventas</th><th>Utilidad Estimada</th></tr></thead><tbody>`;
+            data.ventas.forEach(item => {
+                html += `<tr><td>${item.fecha}</td><td>$${item.ventas.toFixed(2)}</td><td>$${item.utilidad.toFixed(2)}</td></tr>`;
+            });
+            html += `</tbody><tr class="total-row"><td>TOTAL</td><td>$${data.totales.totalVentas.toFixed(2)}</td><td>$${data.totales.totalUtilidad.toFixed(2)}</td></tr></table>`;
+            document.getElementById('ventas-resultado').innerHTML = html;
+        }
+
+        // Cargar productos para el select
+        let productosData = [];
+        async function cargarProductos() {
+            const res = await fetch('/inventario');
+            productosData = await res.json();
+            const select = document.getElementById('producto');
+            // Limpiar opciones previas
+            select.innerHTML = '';
+            productosData.forEach((p) => {
+                const option = document.createElement('option');
+                option.value = p.nombre;
+                option.text = `${p.nombre} (Stock: ${p.stock})`;
+                select.appendChild(option);
+            });
+            
+            // Actualizar el precio del producto seleccionado inicialmente
+            if (productosData.length > 0) {
+                const p = productosData.find(p => p.nombre === select.value);
+                if (p) document.getElementById('precio').value = p.precioVentaSugerido;
+            }
+        }
+
+        // Event listener para actualizar precio al cambiar producto
+        document.getElementById('producto').addEventListener('change', function() {
+            const p = productosData.find(p => p.nombre === this.value);
+            if (p) document.getElementById('precio').value = p.precioVentaSugerido;
+        });
+
+        // Registro de venta
+        document.getElementById('ventaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.submitter;
+            btn.disabled = true;
+            btn.innerText = 'Procesando...';
+
+            const venta = {
+                fecha: new Date().toISOString().split('T')[0],
+                producto: document.getElementById('producto').value,
+                cantidad: parseInt(document.getElementById('cantidad').value),
+                precio: parseFloat(document.getElementById('precio').value),
+                tipo_pago: document.getElementById('tipo_pago').value,
+                estado: document.getElementById('tipo_pago').value === "CREDITO" ? "PENDIENTE" : "PAGADO",
+                cliente: document.getElementById('cliente').value
+            };
+
+            try {
+                const res = await fetch('/ventas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(venta)
+                });
+
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerText = 'Registrar Venta Directa';
+
+                if (data.venta) {
+                    document.getElementById('resultado').innerHTML = `
+                        <div class="card" style="border-left: 5px solid var(--success); background: #f1f8e9; animation: slideIn 0.3s ease-out">
+                            <strong>✓ Venta registrada exitosamente</strong><br>
+                            ${data.venta.producto} x ${data.venta.cantidad} ($${data.venta.importe.toFixed(2)})
+                        </div>`;
+                    
+                    // Limpiar campos solo si tuvo éxito
+                    document.getElementById('cantidad').value = '';
+                    document.getElementById('cliente').value = '';
+
+                    // ¡ACTUALIZACIÓN TOTAL!
+                    await cargarProductos(); // Refrescar stock en el select
+                    await inicializarDashboard(); // Refrescar KPIs y otras secciones
+                    
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo completar la venta'));
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerText = 'Registrar Venta Directa';
+                alert('Error de conexión al servidor');
+            }
+        });
+
+        // Funciones de compatibilidad
+        async function cargarInventario() { await inicializarDashboard(); }
+        async function cargarVentas() { await inicializarDashboard(); }
+        async function cargarMetricas() { await inicializarDashboard(); }
+        async function cargarVentasRecientes() { await inicializarDashboard(); }
+        async function cargarIngenieriaMenu() { await inicializarDashboard(); }
+    </script>
+</body>
+</html>
